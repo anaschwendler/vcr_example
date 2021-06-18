@@ -2,7 +2,7 @@
 
 In the past months I've been working with a lot of external API requests. Since I'm part of a logistics team we have the challenge to make sure our requests are done in time and everything is delivered in good shape.
 
-Part of this task, as software developer, is making sure the code I write is well tested, and does what is supposed to do. But, when integrating our code connection, we don't want to hit APIs with real requests every time we run our tests. This not only generates unnecessary requests, but as well, make them run slower. In order pretend that we are making the real request, there is a tool that helps "faking" this call, while using accurate data from a true request, and recording it as it was a "cassete tape". The name of the tool I refer to is [VCR](https://github.com/vcr/vcr).
+Part of this task, as software developer, is making sure the code I write is well tested, and does what is supposed to do. But, when integrating our code connection, we don't want to hit APIs with real requests every time we run our tests. This not only generates unnecessary requests, but as well, make them run slower. In order to pretend that we are making the real request, there is a tool that helps "faking" this call, while using accurate data from a true request, and recording it as a "cassete tape". The name of the tool I refer to is [VCR](https://github.com/vcr/vcr).
 
 And in this post I'll explain how I've been learning how to use it as well as why I think it is useful.
 
@@ -125,7 +125,11 @@ And this is the cassete file that is used in this call: https://github.com/elast
 
 ## Conclusion
 
-VCR seems to be a very reliable tool to fake request to APIs. But we still need to be aware that sometimes APIs can change and with that we need to record our tests again. This process should be simple and easy to reproduce, so for more tips regarding VCR use, I recommend [this](https://fabioperrella.github.io/10_tips_to_help_using_the_VCR_gem_in_your_ruby_test_suite.html) blog post
+VCR seems to be a very reliable tool to fake request to APIs. But we still need to be aware that sometimes APIs can change and with that we need to record our tests again. This process should be simple and easy to reproduce, so for more tips regarding VCR use, I recommend [this](https://fabioperrella.github.io/10_tips_to_help_using_the_VCR_gem_in_your_ruby_test_suite.html) blog post.
+
+### Hiding confidential credentials in vcr_cassettes
+
+There is an configuration option available to filter sensitive data that can be used to prevent it from being written to the cassete files, the documentation is [here](https://relishapp.com/vcr/vcr/v/5-0-0/docs/configuration/filter-sensitive-data)
 
 ## References
 https://github.com/vcr/vcr
@@ -135,3 +139,5 @@ https://github.com/elastic/site-search-ruby
 https://circleci.com/blog/how-to-test-software-part-i-mocking-stubbing-and-contract-testing/
 
 https://fabioperrella.github.io/10_tips_to_help_using_the_VCR_gem_in_your_ruby_test_suite.html
+
+Thanks [Memuna](https://github.com/memunaharuna) for reviewing it! :tada:
