@@ -1,14 +1,16 @@
 # Using VCR to Mock Your Requests
 
-In the past months I've been working with a lot of external API requests. Since I'm part of a logistics team we have the challenge to make sure our requests are done in time and everything is delivered in shape.
+In the past months I've been working with a lot of external API requests. Since I'm part of a logistics team we have the challenge to make sure our requests are done in time and everything is delivered in good shape.
 
-Part of this task, as software developer, is making sure the code I write is well tested, and does what is supposed to do. But, when testing our code connection to external APIs we don't want to hit it every time we run our tests. In order to do that there is a tool that helps "faking" this call, while using accurate data from a true request, and recording it as it was a "cassete tape". The name of the tool I refer to is VCR.
+Part of this task, as software developer, is making sure the code I write is well tested, and does what is supposed to do. But, when integrating our code connection, we don't want to hit APIs with real requests every time we run our tests. This not only generates unnecessary requests, but as well, make them run slower. In order pretend that we are making the real request, there is a tool that helps "faking" this call, while using accurate data from a true request, and recording it as it was a "cassete tape". The name of the tool I refer to is [VCR](https://github.com/vcr/vcr).
 
-And in this blog post I'll explain how I've been learning how to use it as well as why I think it is useful.
+And in this post I'll explain how I've been learning how to use it as well as why I think it is useful.
+
+![](https://media.giphy.com/media/xT1R9RfuBqWvfo8oDe/giphy.gif)
 
 ## What is a mock test?
 
-Since this post is not about the mocking technique, I'll just briefly introduce it and link a useful article on the topic. In [this post](https://circleci.com/blog/how-to-test-software-part-i-mocking-stubbing-and-contract-testing/) we can see mock testing defined as:
+Since this is not about the mocking technique, I'll just briefly introduce it and link a useful article on the topic. In [this post](https://circleci.com/blog/how-to-test-software-part-i-mocking-stubbing-and-contract-testing/) we can see mock testing defined as:
 
 > Mocking means creating a fake version of an external or internal service that can stand in for the real one, helping your tests run more quickly and more reliably. When your implementation interacts with an object’s properties, rather than its function or behavior, a mock can be used.
 
@@ -24,7 +26,7 @@ Which means that when you first run your test with the VCR syntax, it will recor
 
 ## How to use VCR?
 
-So basically, whenever you want to test a part of code that requires a request you use the `.use_cassette` method to say that you want VCR to deal with that.
+So basically, whenever you want to test a part of code that requires a request, you use the `.use_cassette` method to say that you want VCR to deal with that with a cassete file. It means that if there is a file already recorded, VCR will use it, otherwise, VCR will **automatically create** one (this time making a real request) based on the request made in the test.
 
 Example:
 
@@ -50,7 +52,7 @@ end
 
 Here you are requesting to use a cassete file called `synopsis`, to mock a request to iana.org.
 
-If this is running the first time, VCR will **automatically generate** a "cassete" file which will be stored at `fixtures/vcr_cassettes`, which for the example will be called `synopsis.yml`.
+If this is running the first time, VCR will generate a "cassete" file, which will be stored at `fixtures/vcr_cassettes`, which for the example will be called `synopsis.yml`.
 
 So if you take a look at `fixtures/vcr_cassettes/synopsis.yml` it looks like (I've removed some parts as it was too big):
 
