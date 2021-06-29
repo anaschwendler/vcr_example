@@ -1,20 +1,20 @@
 # Using VCR to Mock Your Requests
 
-In the past months I've been working with a lot of external API requests. Since I'm part of a logistics team we have the challenge to make sure our requests are done in time and everything is delivered in good shape.
+In the past months, I've been working with a lot of external API requests. Since I'm part of the Marley Spoon’s logistics team, our challenge is to make sure our requests are done in time and everything is delivered in good shape.
 
-Part of this task, as software developer, is making sure the code I write is well tested, and does what is supposed to do. But, when integrating our code connection, we don't want to hit APIs with real requests every time we run our tests. This not only generates unnecessary requests, but as well, make them run slower. In order to pretend that we are making the real request, there is a tool that helps "faking" this call, while using accurate data from a true request, and recording it as a "cassete tape". The name of the tool I refer to is [VCR](https://github.com/vcr/vcr).
+Part of this task, as a software developer, is making sure the code I write is well tested, and does what it is supposed to do. Our software has many integrations with our logistics partners. When integrating with their systems, we don't want to hit external APIs with real requests every time we run our tests. This not only generates unnecessary requests that can cause problems with API rate limits and other unwanted side-effects. It also makes them run slower. To avoid that, we pretend to make real requests and there is a tool that helps "faking" these calls: by recording real data from a real network request, we are able to stub a third party’s web service response. The saved data is called a "cassette tape" and the name of the tool I refer to is [VCR](https://github.com/vcr/vcr).
 
-And in this post I'll explain how I've been learning how to use it as well as why I think it is useful.
+In this post I'll explain how I've been learning to use it and why I think it is useful.
 
 ![](https://media.giphy.com/media/xT1R9RfuBqWvfo8oDe/giphy.gif)
 
 ## What is a mock test?
 
-Since this is not about the mocking technique, I'll just briefly introduce it and link a useful article on the topic. In [this post](https://circleci.com/blog/how-to-test-software-part-i-mocking-stubbing-and-contract-testing/) we can see mock testing defined as:
+Since this is not about the mocking technique, I'll just briefly introduce it and link to a useful article on the topic. In [this post](https://circleci.com/blog/how-to-test-software-part-i-mocking-stubbing-and-contract-testing/) we can see mock testing defined as:
 
 > Mocking means creating a fake version of an external or internal service that can stand in for the real one, helping your tests run more quickly and more reliably. When your implementation interacts with an object’s properties, rather than its function or behavior, a mock can be used.
 
-And that is exactly the reason why we use VCR.
+… and that is exactly the reason why we use VCR.
 
 ## What is VCR?
 
@@ -22,11 +22,15 @@ According to [their documentation](https://github.com/vcr/vcr):
 
 > Record your test suite's HTTP interactions and replay them during future test runs for fast, deterministic, accurate tests.
 
-Which means that when you first run your test with the VCR syntax, it will record what happened and next time you run the test again, you will have this recorded version ready to stand in for the real request.
+Which means that when you first run your test with the VCR syntax, it will record what happened and next time you run the test again, you will have the recorded version ready to stand in for the real request.
 
 ## How to use VCR?
 
-So basically, whenever you want to test a part of code that requires a request, you use the `.use_cassette` method to say that you want VCR to deal with that with a cassete file. It means that if there is a file already recorded, VCR will use it, otherwise, VCR will **automatically create** one (this time making a real request) based on the request made in the test.
+I have a basic example [here](https://github.com/anaschwendler/vcr_example).
+
+So basically, whenever you want to test a part of code that requires an external web request, you use the  `.use_cassette` method to state that you want VCR to deal with that with a cassette file. If there already is data with a pre-recorded HTTP interaction, VCR will use it. If not, VCR will **automatically create** a cassette file (this time making a real request) based on the request made in the test.
+
+But still, if you are looking forward to making real requests, VCR also offers different record modes, which can be checked [here](https://relishapp.com/vcr/vcr/v/6-0-0/docs/record-modes)
 
 Example:
 
@@ -50,11 +54,11 @@ class VCRTest < Test::Unit::TestCase
 end
 ```
 
-Here you are requesting to use a cassete file called `synopsis`, to mock a request to iana.org.
+Here you are requesting to use a cassette called `synopsis`, which mocks a request to [iana.org](http://www.iana.org/domains/reserved).
 
-If this is running the first time, VCR will generate a "cassete" file, which will be stored at `fixtures/vcr_cassettes`, which for the example will be called `synopsis.yml`.
+If this is running the first time, VCR will generate a "cassette" file, which will be stored at `fixtures/vcr_cassettes`, which for the example will be called `synopsis.yml`.
 
-So if you take a look at `fixtures/vcr_cassettes/synopsis.yml` it looks like (I've removed some parts as it was too big):
+This is what `fixtures/vcr_cassettes/synopsis.yml` looks like (I've removed some parts as it was too big):
 
 ```
 ---
@@ -111,25 +115,25 @@ http_interactions:
 recorded_with: VCR 5.0.0
 ```
 
-So for now on you, whenever you run your tests, you suite will use this cassete file. It will also run faster, as it has the file in place and don't need to make the request which can take more time.
+From now on your test suite will use this cassette file. It will also run faster, as it has the file in place and doesn't need to make the request which can take more time.
 
 ## Examples in real life
 
 One example of project that uses VCR is this `site-search-ruby` client from elastic: https://github.com/elastic/site-search-ruby
 
-In their context of `Search`, when searching all DocumentTypes in the engine, they use a cassete called `engine_search` to mock a request:
+In their context of `Search`, when searching all DocumentTypes in the engine, they use a cassette called `engine_search` to mock a request:
 
 https://github.com/elastic/site-search-ruby/blob/master/spec/client_spec.rb
 
-And this is the cassete file that is used in this call: https://github.com/elastic/site-search-ruby/blob/master/spec/fixtures/vcr/engine_search.yml
+This is the cassette file that is used in this call: https://github.com/elastic/site-search-ruby/blob/master/spec/fixtures/vcr/engine_search.yml
 
 ## Conclusion
 
-VCR seems to be a very reliable tool to fake request to APIs. But we still need to be aware that sometimes APIs can change and with that we need to record our tests again. This process should be simple and easy to reproduce, so for more tips regarding VCR use, I recommend [this](https://fabioperrella.github.io/10_tips_to_help_using_the_VCR_gem_in_your_ruby_test_suite.html) blog post.
+VCR seems to be a very reliable tool to fake requests to APIs. But we still need to be aware that sometimes APIs can change and with that we need to record our tests again. This process should be simple and easy to reproduce, so for more tips regarding VCR use, I recommend [this](https://fabioperrella.github.io/10_tips_to_help_using_the_VCR_gem_in_your_ruby_test_suite.html) blog post.
 
 ### Hiding confidential credentials in vcr_cassettes
 
-There is an configuration option available to filter sensitive data that can be used to prevent it from being written to the cassete files, the documentation is [here](https://relishapp.com/vcr/vcr/v/5-0-0/docs/configuration/filter-sensitive-data)
+There is a configuration option available to filter sensitive data that can be used to prevent it from being written to the cassette files, the documentation is [here](https://relishapp.com/vcr/vcr/v/5-0-0/docs/configuration/filter-sensitive-data). This is important, as you want to track your cassette YML files in your source control management tool. And secrets don’t belong there.
 
 ## References
 https://github.com/vcr/vcr
